@@ -1,5 +1,3 @@
-// import css from "./ImageCard.module.css";
-
 export default function ImageCard({ data: { urls, alt_description } }) {
   return (
     <div>

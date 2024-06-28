@@ -29,7 +29,11 @@ function App() {
     }
   };
 
-  const openCloseModal = () => setOpenModal(!openModal);
+  const openCloseModal = () => {
+    setOpenModal(!openModal);
+    if (openModal) document.body.style.overflow = "auto";
+    else document.body.style.overflow = "hidden";
+  };
 
   const handleOpenModel = (currentId) => {
     const [currentImg] = images.filter(({ id }) => id === currentId);
@@ -43,11 +47,9 @@ function App() {
       <SearchBar handleSearch={handleSearch} />
       {error && <ErrorMessage />}
       <ImageGallery images={images} handleOpenModel={handleOpenModel} />
-      <ImageModal
-        openCloseModal={openCloseModal}
-        openModal={openModal}
-        modalImg={modalImg}
-      />
+      {openModal && (
+        <ImageModal openCloseModal={openCloseModal} modalImg={modalImg} />
+      )}
     </>
   );
 }
