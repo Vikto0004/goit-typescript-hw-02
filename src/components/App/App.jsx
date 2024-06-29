@@ -25,6 +25,7 @@ function App() {
       .then(({ data }) => {
         setImages((prevImages) => [...prevImages, ...data.results]);
         setToralPages(data.total_pages);
+        if (!data.results.length) setError(true);
       })
       .catch(() => setError(true))
       .finally(() => setLoader(false));
