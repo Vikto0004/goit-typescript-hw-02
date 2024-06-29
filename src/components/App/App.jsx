@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import fetchImages from "../../unsplash-api";
 import SearchBar from "../SearchBar/SearchBar";
 import "./App.css";
@@ -6,31 +6,36 @@ import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import ImageGallery from "../ImageGallery/ImageGallery";
 import ImageModal from "../ImageModal/ImageModal";
 import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn";
+import Loader from "../Loader/Loader";
 
 function App() {
+  const [query, setQuery] = useState("");
   const [images, setImages] = useState([]);
   const [totalPages, setToralPages] = useState(0);
   const [page, setPage] = useState(1);
   const [error, setError] = useState(false);
   const [modalImg, setModalImg] = useState({});
   const [openModal, setOpenModal] = useState(false);
-  const [searchWord, setSearchWord] = useState("");
+  const [loader, setLoader] = useState(false);
 
-  const handleSearch = async (query) => {
-    try {
-      setImages([]);
-      setError(false);
-      setToralPages(0);
-      setPage(1);
-      setSearchWord(query);
+  useEffect(() => {
+    if (!query) return;
+    setLoader(true);
+    fetchImages(query, page)
+      .then(({ data }) => {
+        setImages((prevImages) => [...prevImages, ...data.results]);
+        setToralPages(data.total_pages);
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoader(false));
+  }, [query, page]);
 
-      const { data } = await fetchImages(query);
-      setImages(data.results);
-      setToralPages(data.total_pages);
-      console.log(totalPages);
-    } catch (error) {
-      setError(true);
-    }
+  const onSearch = (query) => {
+    setQuery(query);
+    setImages([]);
+    setError(false);
+    setToralPages(0);
+    setPage(1);
   };
 
   const openCloseModal = () => {
@@ -45,30 +50,16 @@ function App() {
     openCloseModal();
   };
 
-  const onLoadMore = async () => {
-    setPage((prevPage) => {
-      const newPage = prevPage + 1;
-      if (totalPages === newPage) return;
-      fetchImagesWithPage(newPage);
-      return newPage;
-    });
-  };
-
-  const fetchImagesWithPage = async (page) => {
-    try {
-      const { data } = await fetchImages(searchWord, page);
-      setImages((prevRes) => [...prevRes, ...data.results]);
-    } catch (error) {
-      setError(true);
-    }
-  };
+  const onLoadMore = () => setPage((prevPage) => prevPage + 1);
+  const visibleBtnMore = () => images.length !== 0 && page < totalPages;
 
   return (
     <>
-      <SearchBar handleSearch={handleSearch} />
-      {error && <ErrorMessage />}
+      <SearchBar handleSearch={onSearch} />
+      {error && <ErrorMessage query={query} />}
       <ImageGallery images={images} handleOpenModel={handleOpenModel} />
-      {<LoadMoreBtn onLoadMore={onLoadMore} />}
+      {loader && <Loader />}
+      {visibleBtnMore() && <LoadMoreBtn onLoadMore={onLoadMore} />}
       {openModal && (
         <ImageModal openCloseModal={openCloseModal} modalImg={modalImg} />
       )}
