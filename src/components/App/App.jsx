@@ -20,17 +20,24 @@ function App() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (!query) return;
+    if (!query) {
+      setMessage("Enter the word");
+      setError(true);
+      return;
+    }
     setLoader(true);
     fetchImages(query, page)
       .then(({ data }) => {
         setImages((prevImages) => [...prevImages, ...data.results]);
         setToralPages(data.total_pages);
-        if (!data.results.length) setError(true);
+        if (!data.results.length) {
+          setMessage(`Nothing was found for the word "${query}"`);
+          setError(true);
+        }
       })
       .catch(() => {
+        setMessage("Oops, something went wrong, try reloading the page");
         setError(true);
-        setMessage(`Nothing was found for the word "${query}"`);
       })
       .finally(() => setLoader(false));
   }, [query, page]);

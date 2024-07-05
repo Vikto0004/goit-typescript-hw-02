@@ -4,7 +4,6 @@ export default function SearchBar({ handleSearch, setError }) {
   const onSubmit = (e) => {
     e.preventDefault();
     const query = e.target.elements.search.value.trim();
-    console.log(query);
     if (!query) {
       setError(true);
       return;
