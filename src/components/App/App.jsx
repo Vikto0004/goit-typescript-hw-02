@@ -17,6 +17,7 @@ function App() {
   const [modalImg, setModalImg] = useState({});
   const [openModal, setOpenModal] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (!query) return;
@@ -27,7 +28,10 @@ function App() {
         setToralPages(data.total_pages);
         if (!data.results.length) setError(true);
       })
-      .catch(() => setError(true))
+      .catch(() => {
+        setError(true);
+        setMessage(`Nothing was found for the word "${query}"`);
+      })
       .finally(() => setLoader(false));
   }, [query, page]);
 
@@ -56,8 +60,8 @@ function App() {
 
   return (
     <>
-      <SearchBar handleSearch={onSearch} />
-      {error && <ErrorMessage query={query} />}
+      <SearchBar handleSearch={onSearch} setError={setError} />
+      {error && <ErrorMessage message={message} />}
       <ImageGallery images={images} handleOpenModel={handleOpenModel} />
       {loader && <Loader />}
       {visibleBtnMore() && <LoadMoreBtn onLoadMore={onLoadMore} />}
