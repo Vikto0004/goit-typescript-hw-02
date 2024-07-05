@@ -2,22 +2,20 @@ import { useEffect, useState } from "react";
 import fetchImages from "../../unsplash-api";
 import SearchBar from "../SearchBar/SearchBar";
 import "./App.css";
-import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import ImageGallery from "../ImageGallery/ImageGallery";
 import ImageModal from "../ImageModal/ImageModal";
 import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn";
 import Loader from "../Loader/Loader";
+import toast, { Toaster } from "react-hot-toast";
 
 function App() {
   const [query, setQuery] = useState("");
   const [images, setImages] = useState([]);
   const [totalPages, setToralPages] = useState(0);
   const [page, setPage] = useState(1);
-  const [error, setError] = useState(false);
   const [modalImg, setModalImg] = useState({});
   const [openModal, setOpenModal] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (!query) return;
@@ -27,28 +25,21 @@ function App() {
         setImages((prevImages) => [...prevImages, ...data.results]);
         setToralPages(data.total_pages);
         if (!data.results.length) {
-          setMessage(`Nothing was found for the word "${query}"`);
-          setError(true);
+          toast.error(`Nothing was found for the word "${query}"`);
         }
       })
       .catch(() => {
-        setMessage("Oops, something went wrong, try reloading the page");
-        setError(true);
+        toast.error("Oops, something went wrong, try reloading the page");
       })
       .finally(() => setLoader(false));
   }, [query, page]);
 
   const onSearch = (query) => {
-    if (!query) {
-      setMessage("Enter the word");
-      setError(true);
-      console.log("vinn");
-    }
+    if (!query) toast.error("Enter the word");
     setQuery(query);
     setImages([]);
     setToralPages(0);
     setPage(1);
-    setTimeout(() => setError(false), 2000);
   };
 
   const openCloseModal = () => {
@@ -69,7 +60,7 @@ function App() {
   return (
     <>
       <SearchBar handleSearch={onSearch} />
-      {error && <ErrorMessage message={message} />}
+      <Toaster position="top-right" />
       <ImageGallery images={images} handleOpenModel={handleOpenModel} />
       {loader && <Loader />}
       {visibleBtnMore() && <LoadMoreBtn onLoadMore={onLoadMore} />}
