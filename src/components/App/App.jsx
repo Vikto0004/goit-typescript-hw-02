@@ -20,11 +20,7 @@ function App() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (!query) {
-      setMessage("Enter the word");
-      setError(true);
-      return;
-    }
+    if (!query) return;
     setLoader(true);
     fetchImages(query, page)
       .then(({ data }) => {
@@ -43,11 +39,16 @@ function App() {
   }, [query, page]);
 
   const onSearch = (query) => {
+    if (!query) {
+      setMessage("Enter the word");
+      setError(true);
+      console.log("vinn");
+    }
     setQuery(query);
     setImages([]);
-    setError(false);
     setToralPages(0);
     setPage(1);
+    setTimeout(() => setError(false), 2000);
   };
 
   const openCloseModal = () => {
@@ -67,7 +68,7 @@ function App() {
 
   return (
     <>
-      <SearchBar handleSearch={onSearch} setError={setError} />
+      <SearchBar handleSearch={onSearch} />
       {error && <ErrorMessage message={message} />}
       <ImageGallery images={images} handleOpenModel={handleOpenModel} />
       {loader && <Loader />}

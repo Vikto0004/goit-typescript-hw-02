@@ -1,13 +1,13 @@
 import css from "./SearchBar.module.css";
 
-export default function SearchBar({ handleSearch, setError }) {
+export default function SearchBar({ handleSearch }) {
   const onSubmit = (e) => {
     e.preventDefault();
     const query = e.target.elements.search.value.trim();
-    if (!query) {
-      setError(true);
-      return;
-    }
+    // if (!query) {
+    //   setError(true);
+    //   return;
+    // }
     handleSearch(query);
     e.target.reset();
   };
