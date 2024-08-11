@@ -7,21 +7,25 @@ import ImageModal from "../ImageModal/ImageModal";
 import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn";
 import Loader from "../Loader/Loader";
 import toast, { Toaster } from "react-hot-toast";
+import { DataImage } from "../../types";
+
+
 
 function App() {
-  const [query, setQuery] = useState("");
-  const [images, setImages] = useState([]);
-  const [totalPages, setToralPages] = useState(0);
-  const [page, setPage] = useState(1);
-  const [modalImg, setModalImg] = useState({});
-  const [openModal, setOpenModal] = useState(false);
-  const [loader, setLoader] = useState(false);
+  const [query, setQuery] = useState<string>("");
+  const [images, setImages] = useState<DataImage[]>([]);
+  const [totalPages, setToralPages] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
+  const [modalImg, setModalImg] = useState<DataImage | null>(null);
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [loader, setLoader] = useState<boolean>(false);
 
   useEffect(() => {
     if (!query) return;
     setLoader(true);
     fetchImages(query, page)
-      .then(({ data }) => {
+      .then(( data ) => {
+        
         setImages((prevImages) => [...prevImages, ...data.results]);
         setToralPages(data.total_pages);
         if (!data.results.length) {
@@ -34,7 +38,7 @@ function App() {
       .finally(() => setLoader(false));
   }, [query, page]);
 
-  const onSearch = (query) => {
+  const onSearch = (query: string) => {
     if (!query) toast.error("Enter the word");
     setQuery(query);
     setImages([]);
@@ -48,8 +52,9 @@ function App() {
     else document.body.style.overflow = "hidden";
   };
 
-  const handleOpenModel = (currentId) => {
+  const handleOpenModel = (currentId:string) => {
     const [currentImg] = images.filter(({ id }) => id === currentId);
+    
     setModalImg(currentImg);
     openCloseModal();
   };
@@ -61,7 +66,7 @@ function App() {
     <>
       <SearchBar handleSearch={onSearch} />
       <Toaster position="top-right" />
-      <ImageGallery images={images} handleOpenModel={handleOpenModel} />
+      {images.length > 0 && <ImageGallery images={images} handleOpenModel={handleOpenModel} />}
       {loader && <Loader />}
       {visibleBtnMore() && <LoadMoreBtn onLoadMore={onLoadMore} />}
       {openModal && (

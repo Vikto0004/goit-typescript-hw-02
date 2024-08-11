@@ -2,8 +2,16 @@ import css from "./ImageModal.module.css";
 import Modal from "react-modal";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { format } from "date-fns";
+import { DataImage } from "../../types";
 
-export default function ImageModal({ openCloseModal, modalImg }) {
+type Props = {
+  openCloseModal: () => void;
+  modalImg: DataImage | null;
+}
+
+export default function ImageModal({ openCloseModal, modalImg }: Props) {
+ if(modalImg === null) return
+  
   const customStyles = {
     content: {
       top: "50%",
